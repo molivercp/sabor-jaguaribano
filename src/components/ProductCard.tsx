@@ -1,0 +1,38 @@
+import { Product } from "@/types/product";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+
+interface ProductCardProps {
+  product: Product;
+}
+
+export function ProductCard({ product }: ProductCardProps) {
+  const { addToCart } = useCart();
+
+  return (
+    <Card className="group overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300 hover:scale-105">
+      <CardContent className="p-6">
+        <h3 className="mb-2 text-lg font-semibold text-foreground">
+          {product.name}
+        </h3>
+        {product.weight && (
+          <p className="mb-3 text-sm text-muted-foreground">{product.weight}</p>
+        )}
+        <p className="text-2xl font-bold text-primary">
+          R$ {product.price.toFixed(2).replace(".", ",")}
+        </p>
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+        <Button
+          onClick={() => addToCart(product)}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+        >
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          Adicionar
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
