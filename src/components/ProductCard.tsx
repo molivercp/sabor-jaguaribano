@@ -12,7 +12,18 @@ export function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
   return (
-    <Card className="group overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300 hover:scale-105">
+    <Card className="group overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300">
+      {/* Product Image */}
+      {product.image && (
+        <div className="relative h-64 w-full overflow-hidden bg-muted">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+          />
+        </div>
+      )}
+      
       <CardContent className="p-6">
         <h3 className="mb-2 text-lg font-semibold text-foreground">
           {product.name}
@@ -24,13 +35,14 @@ export function ProductCard({ product }: ProductCardProps) {
           R$ {product.price.toFixed(2).replace(".", ",")}
         </p>
       </CardContent>
+      
       <CardFooter className="p-4 pt-0">
         <Button
           onClick={() => addToCart(product)}
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
-          Adicionar
+          Adicionar ao Carrinho
         </Button>
       </CardFooter>
     </Card>

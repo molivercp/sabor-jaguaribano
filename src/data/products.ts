@@ -1,4 +1,10 @@
 import { Product } from "@/types/product";
+import queijoCoalho from "@/assets/queijo-coalho.jpg";
+import queijoManteiga from "@/assets/queijo-manteiga.jpg";
+import mel from "@/assets/mel.jpg";
+import castanha from "@/assets/castanha.jpg";
+import manteigaTerra from "@/assets/manteiga-terra.jpg";
+import doceLeite from "@/assets/doce-leite.jpg";
 
 export const products: Product[] = [
   // Queijo Coalho 950g-1kg
@@ -8,6 +14,7 @@ export const products: Product[] = [
     price: 32.99,
     category: "queijo",
     weight: "950g a 1kg",
+    image: queijoCoalho,
   },
   {
     id: "q2",
@@ -15,6 +22,7 @@ export const products: Product[] = [
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
+    image: queijoCoalho,
   },
   {
     id: "q3",
@@ -22,6 +30,7 @@ export const products: Product[] = [
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
+    image: queijoCoalho,
   },
   {
     id: "q4",
@@ -29,6 +38,7 @@ export const products: Product[] = [
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
+    image: queijoCoalho,
   },
   {
     id: "q5",
@@ -36,6 +46,7 @@ export const products: Product[] = [
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
+    image: queijoCoalho,
   },
   {
     id: "q6",
@@ -43,6 +54,7 @@ export const products: Product[] = [
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
+    image: queijoCoalho,
   },
   // Queijo Coalho 500g
   {
@@ -51,6 +63,7 @@ export const products: Product[] = [
     price: 16.5,
     category: "queijo",
     weight: "500g",
+    image: queijoCoalho,
   },
   {
     id: "q8",
@@ -58,6 +71,7 @@ export const products: Product[] = [
     price: 19.99,
     category: "queijo",
     weight: "500g",
+    image: queijoCoalho,
   },
   {
     id: "q9",
@@ -65,6 +79,7 @@ export const products: Product[] = [
     price: 19.99,
     category: "queijo",
     weight: "500g",
+    image: queijoCoalho,
   },
   {
     id: "q10",
@@ -72,6 +87,7 @@ export const products: Product[] = [
     price: 19.99,
     category: "queijo",
     weight: "500g",
+    image: queijoCoalho,
   },
   {
     id: "q11",
@@ -79,6 +95,7 @@ export const products: Product[] = [
     price: 19.99,
     category: "queijo",
     weight: "500g",
+    image: queijoCoalho,
   },
   {
     id: "q12",
@@ -86,6 +103,7 @@ export const products: Product[] = [
     price: 19.99,
     category: "queijo",
     weight: "500g",
+    image: queijoCoalho,
   },
   // Produtos Variados
   {
@@ -94,6 +112,7 @@ export const products: Product[] = [
     price: 20.99,
     category: "variados",
     weight: "500g",
+    image: queijoManteiga,
   },
   {
     id: "v2",
@@ -163,6 +182,7 @@ export const products: Product[] = [
     price: 15.49,
     category: "variados",
     weight: "250g",
+    image: castanha,
   },
   {
     id: "v12",
@@ -170,6 +190,7 @@ export const products: Product[] = [
     price: 30.99,
     category: "variados",
     weight: "500g",
+    image: castanha,
   },
   {
     id: "v13",
@@ -177,6 +198,7 @@ export const products: Product[] = [
     price: 17.5,
     category: "variados",
     weight: "500ml",
+    image: manteigaTerra,
   },
   {
     id: "v14",
@@ -184,6 +206,7 @@ export const products: Product[] = [
     price: 34.99,
     category: "variados",
     weight: "1litro",
+    image: manteigaTerra,
   },
   {
     id: "v15",
@@ -191,6 +214,7 @@ export const products: Product[] = [
     price: 17.5,
     category: "variados",
     weight: "500ml",
+    image: mel,
   },
   {
     id: "v16",
@@ -198,6 +222,7 @@ export const products: Product[] = [
     price: 34.99,
     category: "variados",
     weight: "1litro",
+    image: mel,
   },
   // Doces Caseiros
   {
@@ -206,6 +231,7 @@ export const products: Product[] = [
     price: 14.99,
     category: "doces",
     weight: "pote 600g",
+    image: doceLeite,
   },
   {
     id: "d2",
@@ -213,6 +239,7 @@ export const products: Product[] = [
     price: 14.99,
     category: "doces",
     weight: "pote 600g",
+    image: doceLeite,
   },
   {
     id: "d3",
@@ -220,6 +247,7 @@ export const products: Product[] = [
     price: 14.99,
     category: "doces",
     weight: "pote 600g",
+    image: doceLeite,
   },
   {
     id: "d4",
@@ -227,6 +255,7 @@ export const products: Product[] = [
     price: 14.99,
     category: "doces",
     weight: "pote 600g",
+    image: doceLeite,
   },
   {
     id: "d5",
@@ -234,6 +263,7 @@ export const products: Product[] = [
     price: 14.99,
     category: "doces",
     weight: "pote 600g",
+    image: doceLeite,
   },
   {
     id: "d6",
@@ -241,6 +271,7 @@ export const products: Product[] = [
     price: 14.99,
     category: "doces",
     weight: "pote 600g",
+    image: doceLeite,
   },
 ];
 
