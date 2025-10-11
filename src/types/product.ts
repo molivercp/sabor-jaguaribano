@@ -5,6 +5,7 @@ export interface Product {
   category: 'queijo' | 'variados' | 'doces';
   description?: string;
   weight?: string;
+  image?: string;
 }
 
 export interface CartItem extends Product {
