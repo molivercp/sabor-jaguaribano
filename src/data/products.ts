@@ -1,10 +1,16 @@
 import { Product } from "@/types/product";
 import queijoCoalho from "@/assets/queijo-coalho.jpg";
 import queijoManteiga from "@/assets/queijo-manteiga.jpg";
+import queijoErvas from "@/assets/queijo-ervas.jpg";
 import mel from "@/assets/mel.jpg";
 import castanha from "@/assets/castanha.jpg";
+import castanhaCaramelizada from "@/assets/castanha-caramelizada.jpg";
 import manteigaTerra from "@/assets/manteiga-terra.jpg";
 import doceLeite from "@/assets/doce-leite.jpg";
+import cremeNata from "@/assets/creme-nata.jpg";
+import macaxeira from "@/assets/macaxeira.jpg";
+import tilapia from "@/assets/tilapia.jpg";
+import farofa from "@/assets/farofa.jpg";
 
 export const products: Product[] = [
   // Queijo Coalho 950g-1kg
@@ -30,7 +36,7 @@ export const products: Product[] = [
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
-    image: queijoCoalho,
+    image: queijoErvas,
   },
   {
     id: "q4",
@@ -79,7 +85,7 @@ export const products: Product[] = [
     price: 19.99,
     category: "queijo",
     weight: "500g",
-    image: queijoCoalho,
+    image: queijoErvas,
   },
   {
     id: "q10",
@@ -120,6 +126,7 @@ export const products: Product[] = [
     price: 11.99,
     category: "variados",
     weight: "pote 500g",
+    image: cremeNata,
   },
   {
     id: "v3",
@@ -127,6 +134,7 @@ export const products: Product[] = [
     price: 11.99,
     category: "variados",
     weight: "pacote 1kg",
+    image: macaxeira,
   },
   {
     id: "v4",
@@ -161,6 +169,7 @@ export const products: Product[] = [
     price: 31.99,
     category: "variados",
     weight: "1kg",
+    image: tilapia,
   },
   {
     id: "v9",
@@ -168,6 +177,7 @@ export const products: Product[] = [
     price: 17.99,
     category: "variados",
     weight: "pote 500g",
+    image: farofa,
   },
   {
     id: "v10",
@@ -175,6 +185,7 @@ export const products: Product[] = [
     price: 11.99,
     category: "variados",
     weight: "pote 250g",
+    image: farofa,
   },
   {
     id: "v11",

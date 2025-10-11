@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "./CartDrawer";
+import logo from "@/assets/logo.png";
 
 export function Header() {
   const { cart } = useCart();
@@ -25,7 +26,7 @@ export function Header() {
 
           {/* Logo */}
           <div className="flex items-center justify-center flex-1">
-            <h1 className="text-3xl font-bold text-primary">Sabor Jaguaribano</h1>
+            <img src={logo} alt="Sabor Jaguaribano" className="h-16 w-16 object-contain" />
           </div>
 
           {/* Cart */}
