@@ -9,17 +9,40 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
+import { z } from "zod";
 
 interface CheckoutDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
+const addressSchema = z.object({
+  name: z.string().trim().min(3, "Nome deve ter no mínimo 3 caracteres").max(100, "Nome muito longo"),
+  phone: z.string().trim().min(10, "Telefone inválido").max(15, "Telefone inválido"),
+  street: z.string().trim().min(5, "Endereço deve ter no mínimo 5 caracteres").max(200, "Endereço muito longo"),
+  number: z.string().trim().min(1, "Número é obrigatório").max(10, "Número muito longo"),
+  complement: z.string().trim().max(100, "Complemento muito longo").optional(),
+  neighborhood: z.string().trim().min(3, "Bairro deve ter no mínimo 3 caracteres").max(100, "Bairro muito longo"),
+  city: z.string().trim().min(3, "Cidade é obrigatória").max(100, "Cidade muito longa"),
+});
+
 export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
   const { cart, getTotal, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<string>("dinheiro");
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    street: "",
+    number: "",
+    complement: "",
+    neighborhood: "",
+    city: "Fortaleza",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleCheckout = () => {
     if (cart.length === 0) {
@@ -27,8 +50,38 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
       return;
     }
 
+    // Validação do formulário
+    try {
+      addressSchema.parse(formData);
+      setErrors({});
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const newErrors: Record<string, string> = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            newErrors[err.path[0].toString()] = err.message;
+          }
+        });
+        setErrors(newErrors);
+        toast.error("Preencha todos os campos obrigatórios");
+        return;
+      }
+    }
+
     // Formata a mensagem para WhatsApp
     let message = "*Pedido - Sabor Jaguaribano*\n\n";
+    
+    message += "*Dados do Cliente:*\n";
+    message += `Nome: ${formData.name}\n`;
+    message += `Telefone: ${formData.phone}\n`;
+    message += `Endereço: ${formData.street}, ${formData.number}`;
+    if (formData.complement) {
+      message += ` - ${formData.complement}`;
+    }
+    message += `\n`;
+    message += `Bairro: ${formData.neighborhood}\n`;
+    message += `Cidade: ${formData.city}\n\n`;
+    
     message += "*Itens:*\n";
     
     cart.forEach((item) => {
@@ -67,16 +120,117 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Finalizar Pedido</DialogTitle>
           <DialogDescription>
-            Escolha a forma de pagamento. O pagamento será feito no ato da entrega.
+            Preencha seus dados para entrega e escolha a forma de pagamento.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
+          {/* Dados do Cliente */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Dados para Entrega</h3>
+            
+            <div className="space-y-2">
+              <Label htmlFor="name">Nome Completo *</Label>
+              <Input
+                id="name"
+                placeholder="Seu nome completo"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className={errors.name ? "border-destructive" : ""}
+              />
+              {errors.name && (
+                <p className="text-xs text-destructive">{errors.name}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefone/WhatsApp *</Label>
+              <Input
+                id="phone"
+                placeholder="(85) 99999-9999"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className={errors.phone ? "border-destructive" : ""}
+              />
+              {errors.phone && (
+                <p className="text-xs text-destructive">{errors.phone}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="street">Rua/Avenida *</Label>
+                <Input
+                  id="street"
+                  placeholder="Nome da rua"
+                  value={formData.street}
+                  onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                  className={errors.street ? "border-destructive" : ""}
+                />
+                {errors.street && (
+                  <p className="text-xs text-destructive">{errors.street}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="number">Número *</Label>
+                <Input
+                  id="number"
+                  placeholder="123"
+                  value={formData.number}
+                  onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                  className={errors.number ? "border-destructive" : ""}
+                />
+                {errors.number && (
+                  <p className="text-xs text-destructive">{errors.number}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="complement">Complemento</Label>
+              <Input
+                id="complement"
+                placeholder="Apt, bloco, casa..."
+                value={formData.complement}
+                onChange={(e) => setFormData({ ...formData, complement: e.target.value })}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
+                <Label htmlFor="neighborhood">Bairro *</Label>
+                <Input
+                  id="neighborhood"
+                  placeholder="Seu bairro"
+                  value={formData.neighborhood}
+                  onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
+                  className={errors.neighborhood ? "border-destructive" : ""}
+                />
+                {errors.neighborhood && (
+                  <p className="text-xs text-destructive">{errors.neighborhood}</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="city">Cidade *</Label>
+                <Input
+                  id="city"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className={errors.city ? "border-destructive" : ""}
+                />
+                {errors.city && (
+                  <p className="text-xs text-destructive">{errors.city}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Forma de Pagamento */}
+          <div className="space-y-2 pt-2 border-t">
             <Label>Forma de Pagamento</Label>
             <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
               <div className="flex items-center space-x-2">
@@ -100,8 +254,8 @@ export function CheckoutDialog({ open, onOpenChange }: CheckoutDialogProps) {
             </RadioGroup>
           </div>
 
-          <div className="rounded-lg bg-muted p-4">
-            <p className="text-sm text-muted-foreground">
+          <div className="rounded-lg bg-muted p-3">
+            <p className="text-xs text-muted-foreground">
               Seu pedido será enviado via WhatsApp para confirmação. 
               O pagamento será realizado no momento da entrega.
             </p>
