@@ -41,8 +41,10 @@ export function ProductCard({ product }: ProductCardProps) {
           onClick={() => addToCart(product)}
           className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
         >
-          <ShoppingCart className="mr-2 h-4 w-4" />
-          Adicionar ao Carrinho
+          <ShoppingCart className="h-4 w-4 sm:mr-2" />
+          <span className="hidden sm:inline">
+            Adicionar ao Carrinho
+          </span>
         </Button>
       </CardFooter>
     </Card>
