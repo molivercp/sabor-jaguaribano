@@ -5,7 +5,7 @@ export function ProductSection() {
   const categories = ["queijo", "variados", "doces"] as const;
 
   return (
-    <section className="py-16 px-4">
+    <section className="py-16">
       <div className="container mx-auto">
         {categories.map((category) => {
           const categoryProducts = products.filter((p) => p.category === category);
