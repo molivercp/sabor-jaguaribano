@@ -15,7 +15,7 @@ export function ProductCard({ product }: ProductCardProps) {
     <Card className="group overflow-hidden shadow-soft hover:shadow-elevated transition-all duration-300">
       {/* Product Image */}
       {product.image && (
-        <div className="relative h-64 w-full overflow-hidden bg-muted">
+        <div className="relative h-56 w-full overflow-hidden bg-muted">
           <img
             src={product.image}
             alt={product.name}

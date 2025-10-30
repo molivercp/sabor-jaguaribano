@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "./CartDrawer";
-import logo from "@/assets/logo.png";
+import logo from "@/public/logo.png";
 
 export function Header() {
   const { cart } = useCart();
