@@ -1,11 +1,17 @@
 import { products } from "@/data/products";
 import { ProductCard } from "./ProductCard";
+import { useSearch } from "@/contexts/SearchContext";
 
 export function BestSellers() {
   // IDs dos produtos mais vendidos: queijo coalho tradicional 1kg, doce de leite cremoso, manteiga da terra 500ml
   const bestSellerIds = ["q1", "d1", "v13"];
-  
-  const bestSellers = products.filter((p) => bestSellerIds.includes(p.id));
+  const { searchTerm } = useSearch();
+
+  const bestSellers = products.filter(
+    (p) =>
+      bestSellerIds.includes(p.id) &&
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <section className="py-16 px-4 bg-background">

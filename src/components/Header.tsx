@@ -2,12 +2,14 @@ import { ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
+import { useSearch } from "@/contexts/SearchContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "./CartDrawer";
 import logo from "@/public/logo.png";
 
 export function Header() {
   const { cart } = useCart();
+  const { searchTerm, setSearchTerm } = useSearch();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -21,6 +23,8 @@ export function Header() {
               type="search"
               placeholder="Buscar produtos..."
               className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
