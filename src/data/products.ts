@@ -1,16 +1,22 @@
 import { Product } from "@/types/product";
-import queijoCoalho from "@/assets/queijo-coalho.jpg";
-import queijoManteiga from "@/assets/queijo-manteiga.jpg";
+import queijoCoalho from "@/assets/queijocoalho.png";
+import queijoManteiga from "@/assets/queijo-de-manteiga-caseiro.png";
 import queijoErvas from "@/assets/queijo-ervas.jpg";
-import mel from "@/assets/mel.jpg";
-import castanha from "@/assets/castanha.jpg";
-import castanhaCaramelizada from "@/assets/castanha-caramelizada.jpg";
-import manteigaTerra from "@/assets/manteiga-terra.jpg";
-import doceLeite from "@/assets/doce-leite.jpg";
+import mel from "@/assets/mel.png";
+import castanha from "@/assets/castanha.png";
+import manteigaTerra from "@/assets/manteigadaterra.png";
+import doceLeite from "@/assets/doces.png";
 import cremeNata from "@/assets/creme-nata.jpg";
 import macaxeira from "@/assets/macaxeira.jpg";
 import tilapia from "@/assets/tilapia.jpg";
 import farofa from "@/assets/farofa.jpg";
+import carneiro from "@/assets/carneiro.jpg";
+import carneSol from "@/assets/Carne-de-Sol.jpg";
+import buchada from "@/assets/buchada.jpg";
+import galinhaCaipira from "@/assets/galinhacaipira.jpg";
+import queijocomcarne from "@/assets/queijocomcarnedesol.png";
+import queijocompimenta from "@/assets/queijocompimenta.png";
+import queijooregano from "@/assets/queijocomoregano.png";
 
 export const products: Product[] = [
   // Queijo Coalho 950g-1kg
@@ -24,15 +30,15 @@ export const products: Product[] = [
   },
   {
     id: "q2",
-    name: "Queijo c/orégano",
+    name: "Queijo com orégano",
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
-    image: queijoCoalho,
+    image: queijooregano,
   },
   {
     id: "q3",
-    name: "Queijo c/ervas finas e pimenta calabresa",
+    name: "Queijo com ervas finas e pimenta calabresa",
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
@@ -40,7 +46,7 @@ export const products: Product[] = [
   },
   {
     id: "q4",
-    name: "Queijo c/chimichurri",
+    name: "Queijo com chimichurri",
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
@@ -48,19 +54,19 @@ export const products: Product[] = [
   },
   {
     id: "q5",
-    name: "Queijo c/ pimenta biquinho",
+    name: "Queijo com pimenta biquinho",
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
-    image: queijoCoalho,
+    image: queijocompimenta,
   },
   {
     id: "q6",
-    name: "Queijo c/carne de sol",
+    name: "Queijo com carne de sol",
     price: 39.99,
     category: "queijo",
     weight: "950g a 1kg",
-    image: queijoCoalho,
+    image: queijocomcarne,
   },
   // Queijo Coalho 500g
   {
@@ -73,15 +79,15 @@ export const products: Product[] = [
   },
   {
     id: "q8",
-    name: "Queijo c/orégano",
+    name: "Queijo com orégano",
     price: 19.99,
     category: "queijo",
     weight: "500g",
-    image: queijoCoalho,
+    image: queijooregano,
   },
   {
     id: "q9",
-    name: "Queijo ervas finas c/ pimenta calabresa",
+    name: "Queijo com ervas finas e pimenta calabresa",
     price: 19.99,
     category: "queijo",
     weight: "500g",
@@ -89,15 +95,15 @@ export const products: Product[] = [
   },
   {
     id: "q10",
-    name: "Queijo c/ pimenta biquinho",
+    name: "Queijo com pimenta biquinho",
     price: 19.99,
     category: "queijo",
     weight: "500g",
-    image: queijoCoalho,
+    image: queijocompimenta,
   },
   {
     id: "q11",
-    name: "Queijo c/chimichurri",
+    name: "Queijo com chimichurri",
     price: 19.99,
     category: "queijo",
     weight: "500g",
@@ -105,11 +111,11 @@ export const products: Product[] = [
   },
   {
     id: "q12",
-    name: "Queijo c/ carne de sol",
+    name: "Queijo com carne de sol",
     price: 19.99,
     category: "queijo",
     weight: "500g",
-    image: queijoCoalho,
+    image: queijocomcarne,
   },
   // Produtos Variados
   {
@@ -141,7 +147,8 @@ export const products: Product[] = [
     name: "Galinha caipira",
     price: 54.99,
     category: "variados",
-    weight: "1.3kg a 1.5kg",
+    weight: "1,3kg a 1,5kg",
+    image: galinhaCaipira,
   },
   {
     id: "v5",
@@ -149,6 +156,7 @@ export const products: Product[] = [
     price: 28.99,
     category: "variados",
     weight: "a partir de 2kg",
+    image: carneiro,
   },
   {
     id: "v6",
@@ -156,12 +164,15 @@ export const products: Product[] = [
     price: 44.99,
     category: "variados",
     weight: "1kg",
+    image: carneSol,
   },
   {
     id: "v7",
     name: "Buchada",
     price: 44.99,
     category: "variados",
+    weight: "1 unidade",
+    image: buchada,
   },
   {
     id: "v8",
@@ -189,7 +200,7 @@ export const products: Product[] = [
   },
   {
     id: "v11",
-    name: "Castanha caseira/torrada",
+    name: "Castanha caseira torrada",
     price: 15.49,
     category: "variados",
     weight: "250g",
@@ -197,7 +208,7 @@ export const products: Product[] = [
   },
   {
     id: "v12",
-    name: "Castanha caseira/torrada",
+    name: "Castanha caseira torrada",
     price: 30.99,
     category: "variados",
     weight: "500g",
@@ -216,7 +227,7 @@ export const products: Product[] = [
     name: "Manteiga da terra",
     price: 34.99,
     category: "variados",
-    weight: "1litro",
+    weight: "1 litro",
     image: manteigaTerra,
   },
   {
@@ -232,7 +243,7 @@ export const products: Product[] = [
     name: "Mel de abelha italiana puro",
     price: 34.99,
     category: "variados",
-    weight: "1litro",
+    weight: "1 litro",
     image: mel,
   },
   // Doces Caseiros
