@@ -1,21 +1,44 @@
-import { products, categoryNames } from "@/data/products";
+import { categoryNames } from "@/data/products";
 import { ProductCard } from "./ProductCard";
 import { useSearch } from "@/contexts/SearchContext";
 import { useMemo } from "react";
+import { useProducts } from "@/hooks/useProducts";
+import { Loader2 } from "lucide-react";
 
 export function ProductSection() {
   const categories = ["queijo", "variados", "doces"] as const;
   const { searchTerm } = useSearch();
+  const { products, isLoading } = useProducts();
 
   const allFilteredProducts = useMemo(
     () =>
-      products.filter((p) =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
-      ),
-    [searchTerm]
+      products
+        .filter((p) => p.available !== false)
+        .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          description: p.description || undefined,
+          price: p.price,
+          category: p.category as 'queijo' | 'variados' | 'doces',
+          weight: p.weight || undefined,
+          image: p.image_url || undefined,
+          available: p.available,
+        })),
+    [products, searchTerm]
   );
 
   const hasAnyProduct = allFilteredProducts.length > 0;
+
+  if (isLoading) {
+    return (
+      <section className="py-16">
+        <div className="container mx-auto flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </section>
+    );
+  }
 
   if (searchTerm && !hasAnyProduct) {
     return (
