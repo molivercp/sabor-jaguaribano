@@ -1,18 +1,15 @@
-import { ShoppingCart, Search, LogIn } from "lucide-react";
+import { ShoppingCart, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { useSearch } from "@/contexts/SearchContext";
-import { useAuth } from "@/contexts/AuthContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartDrawer } from "./CartDrawer";
-import { Link } from "react-router-dom";
 import logo from "@/public/logo.png";
 
 export function Header() {
   const { cart } = useCart();
   const { searchTerm, setSearchTerm } = useSearch();
-  const { user, isAdmin } = useAuth();
   const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -38,19 +35,6 @@ export function Header() {
 
           {/* Cart */}
           <div className="flex items-center gap-4 flex-1 justify-end">
-            {user && isAdmin && (
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/admin">Admin</Link>
-              </Button>
-            )}
-            {!user && (
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/auth">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Login
-                </Link>
-              </Button>
-            )}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" size="icon" className="relative">
