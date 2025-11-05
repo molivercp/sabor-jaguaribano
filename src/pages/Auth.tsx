@@ -56,7 +56,6 @@ export default function Auth() {
     setIsLoading(true);
     try {
       await signIn(loginData.email, loginData.password);
-      navigate("/admin");
     } catch (error) {
       // Error already handled in signIn
     } finally {

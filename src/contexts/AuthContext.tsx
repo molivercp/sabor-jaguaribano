@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 interface AuthContextType {
@@ -20,6 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const checkAdminRole = async (userId: string) => {
     try {
@@ -80,6 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) throw error;
       toast.success("Login realizado com sucesso!");
+      navigate("/admin");
     } catch (error: any) {
       console.error("Erro no login:", error);
       toast.error(error.message || "Erro ao fazer login");
@@ -117,6 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(null);
       setIsAdmin(false);
       toast.success("Logout realizado com sucesso!");
+      navigate("/");
     } catch (error: any) {
       console.error("Erro no logout:", error);
       toast.error("Erro ao fazer logout");
