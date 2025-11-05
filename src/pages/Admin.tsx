@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useProducts, productSchema, type ProductFormData } from "@/hooks/useProducts";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,12 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 export default function Admin() {
   const { products, isLoading, addProduct, isAddingProduct, updateAvailability } = useProducts();
   const { signOut, user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -104,7 +111,7 @@ export default function Admin() {
           <h1 className="text-4xl font-bold text-secondary">Administração de Produtos</h1>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button variant="outline" onClick={signOut}>
+            <Button variant="outline" onClick={handleSignOut}>
               <LogOut className="mr-2 h-4 w-4" />
               Sair
             </Button>
