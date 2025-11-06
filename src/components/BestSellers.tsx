@@ -1,50 +1,17 @@
+import { products } from "@/data/products";
 import { ProductCard } from "./ProductCard";
 import { useSearch } from "@/contexts/SearchContext";
-import { useProducts } from "@/hooks/useProducts";
-import { useMemo } from "react";
-import { Loader2 } from "lucide-react";
 
 export function BestSellers() {
   // IDs dos produtos mais vendidos: queijo coalho tradicional 1kg, doce de leite cremoso, manteiga da terra 500ml
   const bestSellerIds = ["q1", "d1", "v13"];
   const { searchTerm } = useSearch();
-  const { products, isLoading } = useProducts();
 
-  const bestSellers = useMemo(
-    () =>
-      products
-        .filter((p) => p.available !== false)
-        .filter(
-          (p) =>
-            bestSellerIds.includes(p.id) &&
-            p.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        .map((p) => ({
-          id: p.id,
-          name: p.name,
-          description: p.description || undefined,
-          price: p.price,
-          category: p.category as 'queijo' | 'variados' | 'doces',
-          weight: p.weight || undefined,
-          image: p.image_url || undefined,
-          available: p.available,
-        })),
-    [products, searchTerm, bestSellerIds]
+  const bestSellers = products.filter(
+    (p) =>
+      bestSellerIds.includes(p.id) &&
+      p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
-  if (isLoading) {
-    return (
-      <section className="py-16 px-4 bg-background">
-        <div className="container mx-auto flex justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        </div>
-      </section>
-    );
-  }
-
-  if (bestSellers.length === 0) {
-    return null;
-  }
 
   return (
     <section className="py-16 px-4 bg-background">
