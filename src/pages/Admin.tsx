@@ -101,6 +101,7 @@ export default function Admin() {
       weight: product.weight || "",
       available: product.available,
     });
+    setImageFile(null); // Reset image file
     setImagePreview(product.image_url || "");
     setIsEditDialogOpen(true);
   };
@@ -140,15 +141,15 @@ export default function Admin() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4">
+    <div className="min-h-screen bg-background py-4 px-4 sm:py-8 md:py-12">
       <div className="container mx-auto max-w-6xl">
-        <h1 className="mb-8 text-4xl font-bold text-secondary">Administração de Produtos</h1>
+        <h1 className="mb-6 text-2xl sm:text-3xl md:text-4xl font-bold text-secondary">Administração de Produtos</h1>
 
         {/* Formulário de Adição */}
-        <form onSubmit={handleSubmit} className="mb-12 rounded-lg border bg-card p-6 shadow-sm">
-          <h2 className="mb-6 text-2xl font-semibold text-foreground">Adicionar Novo Produto</h2>
+        <form onSubmit={handleSubmit} className="mb-8 sm:mb-12 rounded-lg border bg-card p-4 sm:p-6 shadow-sm">
+          <h2 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-semibold text-foreground">Adicionar Novo Produto</h2>
           
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Nome *</Label>
               <Input
@@ -205,7 +206,7 @@ export default function Admin() {
               {errors.weight && <p className="text-sm text-destructive">{errors.weight}</p>}
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="description">Descrição</Label>
               <Textarea
                 id="description"
@@ -217,7 +218,7 @@ export default function Admin() {
               {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
             </div>
 
-            <div className="space-y-2 md:col-span-2">
+            <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="image">Imagem do Produto</Label>
               <div className="flex items-center gap-4">
                 {imagePreview ? (
@@ -276,9 +277,9 @@ export default function Admin() {
         </form>
 
         {/* Tabela de Produtos */}
-        <div className="rounded-lg border bg-card shadow-sm">
-          <div className="p-6">
-            <h2 className="mb-4 text-2xl font-semibold text-foreground">Produtos Cadastrados</h2>
+        <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
+          <div className="p-4 sm:p-6">
+            <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-foreground">Produtos Cadastrados</h2>
             
             {isLoading ? (
               <div className="flex justify-center py-8">
@@ -289,73 +290,80 @@ export default function Admin() {
                 Nenhum produto cadastrado ainda.
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Imagem</TableHead>
-                    <TableHead>Nome</TableHead>
-                    <TableHead>Categoria</TableHead>
-                    <TableHead>Preço</TableHead>
-                    <TableHead>Disponível</TableHead>
-                    <TableHead>Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {products.map((product) => (
-                    <TableRow key={product.id} className={!product.available ? "opacity-50" : ""}>
-                      <TableCell>
-                        {product.image_url ? (
-                          <img
-                            src={product.image_url}
-                            alt={product.name}
-                            className="h-12 w-12 rounded object-cover"
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-16 sm:w-20">Imagem</TableHead>
+                      <TableHead>Nome</TableHead>
+                      <TableHead className="hidden sm:table-cell">Categoria</TableHead>
+                      <TableHead>Preço</TableHead>
+                      <TableHead className="hidden md:table-cell">Disponível</TableHead>
+                      <TableHead className="w-16">Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {products.map((product) => (
+                      <TableRow key={product.id} className={!product.available ? "opacity-50" : ""}>
+                        <TableCell>
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="h-10 w-10 sm:h-12 sm:w-12 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded bg-muted" />
+                          )}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <div className="max-w-[120px] sm:max-w-none truncate">{product.name}</div>
+                          <div className="text-xs text-muted-foreground sm:hidden">
+                            {categoryNames[product.category]} • {formatPrice(product.price)}
+                          </div>
+                        </TableCell>
+                        <TableCell className="hidden sm:table-cell">{categoryNames[product.category]}</TableCell>
+                        <TableCell className="hidden sm:table-cell">{formatPrice(product.price)}</TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          <Switch
+                            checked={product.available}
+                            onCheckedChange={(checked) =>
+                              updateAvailability({ id: product.id, available: checked })
+                            }
                           />
-                        ) : (
-                          <div className="h-12 w-12 rounded bg-muted" />
-                        )}
-                      </TableCell>
-                      <TableCell className="font-medium">{product.name}</TableCell>
-                      <TableCell>{categoryNames[product.category]}</TableCell>
-                      <TableCell>{formatPrice(product.price)}</TableCell>
-                      <TableCell>
-                        <Switch
-                          checked={product.available}
-                          onCheckedChange={(checked) =>
-                            updateAvailability({ id: product.id, available: checked })
-                          }
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Dialog open={isEditDialogOpen && editingProduct?.id === product.id} onOpenChange={(open) => {
-                          setIsEditDialogOpen(open);
-                          if (!open) {
-                            setEditingProduct(null);
-                            setFormData({
-                              name: "",
-                              description: "",
-                              price: 0,
-                              category: "queijo",
-                              weight: "",
-                              available: true,
-                            });
-                            removeImage();
-                          }
-                        }}>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => openEditDialog(product)}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                        </TableCell>
+                        <TableCell>
+                          <Dialog open={isEditDialogOpen && editingProduct?.id === product.id} onOpenChange={(open) => {
+                            setIsEditDialogOpen(open);
+                            if (!open) {
+                              setEditingProduct(null);
+                              setFormData({
+                                name: "",
+                                description: "",
+                                price: 0,
+                                category: "queijo",
+                                weight: "",
+                                available: true,
+                              });
+                              removeImage();
+                            }
+                          }}>
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() => openEditDialog(product)}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
-                              <DialogTitle>Editar Produto</DialogTitle>
+                              <DialogTitle className="text-lg sm:text-xl">Editar Produto</DialogTitle>
                             </DialogHeader>
-                            <form onSubmit={handleEditSubmit} className="space-y-6">
-                              <div className="grid gap-6 md:grid-cols-2">
+                            <form onSubmit={handleEditSubmit} className="space-y-4 sm:space-y-6">
+                              <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
                                 <div className="space-y-2">
                                   <Label htmlFor="edit-name">Nome *</Label>
                                   <Input
@@ -412,7 +420,7 @@ export default function Admin() {
                                   {errors.weight && <p className="text-sm text-destructive">{errors.weight}</p>}
                                 </div>
 
-                                <div className="space-y-2 md:col-span-2">
+                                <div className="space-y-2 sm:col-span-2">
                                   <Label htmlFor="edit-description">Descrição</Label>
                                   <Textarea
                                     id="edit-description"
@@ -424,7 +432,7 @@ export default function Admin() {
                                   {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
                                 </div>
 
-                                <div className="space-y-2 md:col-span-2">
+                                <div className="space-y-2 sm:col-span-2">
                                   <Label htmlFor="edit-image">Imagem do Produto</Label>
                                   <div className="flex items-center gap-4">
                                     {imagePreview ? (
@@ -476,27 +484,29 @@ export default function Admin() {
                                 </div>
                               </div>
 
-                              <div className="flex justify-end gap-2">
+                              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
                                 <Button
                                   type="button"
                                   variant="outline"
                                   onClick={() => setIsEditDialogOpen(false)}
+                                  className="w-full sm:w-auto"
                                 >
                                   Cancelar
                                 </Button>
-                                <Button type="submit" disabled={isUpdatingProduct}>
+                                <Button type="submit" disabled={isUpdatingProduct} className="w-full sm:w-auto">
                                   {isUpdatingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                   Salvar Alterações
                                 </Button>
                               </div>
                             </form>
                           </DialogContent>
-                        </Dialog>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                          </Dialog>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </div>
         </div>
