@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useProducts, productSchema, type ProductFormData } from "@/hooks/useProducts";
-import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, X, Upload, LogOut } from "lucide-react";
+import { Loader2, X, Upload } from "lucide-react";
 import { categoryNames } from "@/data/products";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -16,7 +15,6 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/web
 
 export default function Admin() {
   const { products, isLoading, addProduct, isAddingProduct, updateAvailability } = useProducts();
-  const { signOut, user } = useAuth();
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -100,16 +98,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="container mx-auto max-w-6xl">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-4xl font-bold text-secondary">Administração de Produtos</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button variant="outline" onClick={signOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
-          </div>
-        </div>
+        <h1 className="mb-8 text-4xl font-bold text-secondary">Administração de Produtos</h1>
 
         {/* Formulário de Adição */}
         <form onSubmit={handleSubmit} className="mb-12 rounded-lg border bg-card p-6 shadow-sm">
