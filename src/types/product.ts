@@ -6,6 +6,7 @@ export interface Product {
   description?: string;
   weight?: string;
   image?: string;
+  available?: boolean;
 }
 
 export interface CartItem extends Product {
