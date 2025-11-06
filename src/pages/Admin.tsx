@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProducts, productSchema, type ProductFormData } from "@/hooks/useProducts";
+import { useProducts, productSchema, type ProductFormData, type Product } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, X, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Loader2, X, Upload, Pencil } from "lucide-react";
 import { categoryNames } from "@/data/products";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function Admin() {
-  const { products, isLoading, addProduct, isAddingProduct, updateAvailability } = useProducts();
+  const { products, isLoading, addProduct, isAddingProduct, updateAvailability, updateProduct, isUpdatingProduct } = useProducts();
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -28,6 +29,8 @@ export default function Admin() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,6 +78,47 @@ export default function Admin() {
 
     addProduct({ productData: formData, imageFile: imageFile || undefined }, {
       onSuccess: () => {
+        setFormData({
+          name: "",
+          description: "",
+          price: 0,
+          category: "queijo",
+          weight: "",
+          available: true,
+        });
+        removeImage();
+      },
+    });
+  };
+
+  const openEditDialog = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      name: product.name,
+      description: product.description || "",
+      price: product.price,
+      category: product.category as "queijo" | "variados" | "doces",
+      weight: product.weight || "",
+      available: product.available,
+    });
+    setImagePreview(product.image_url || "");
+    setIsEditDialogOpen(true);
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm() || !editingProduct) return;
+
+    updateProduct({ 
+      id: editingProduct.id, 
+      productData: formData, 
+      imageFile: imageFile || undefined,
+      currentImageUrl: editingProduct.image_url
+    }, {
+      onSuccess: () => {
+        setIsEditDialogOpen(false);
+        setEditingProduct(null);
         setFormData({
           name: "",
           description: "",
@@ -253,6 +297,7 @@ export default function Admin() {
                     <TableHead>Categoria</TableHead>
                     <TableHead>Preço</TableHead>
                     <TableHead>Disponível</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -279,6 +324,174 @@ export default function Admin() {
                             updateAvailability({ id: product.id, available: checked })
                           }
                         />
+                      </TableCell>
+                      <TableCell>
+                        <Dialog open={isEditDialogOpen && editingProduct?.id === product.id} onOpenChange={(open) => {
+                          setIsEditDialogOpen(open);
+                          if (!open) {
+                            setEditingProduct(null);
+                            setFormData({
+                              name: "",
+                              description: "",
+                              price: 0,
+                              category: "queijo",
+                              weight: "",
+                              available: true,
+                            });
+                            removeImage();
+                          }
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openEditDialog(product)}
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle>Editar Produto</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleEditSubmit} className="space-y-6">
+                              <div className="grid gap-6 md:grid-cols-2">
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-name">Nome *</Label>
+                                  <Input
+                                    id="edit-name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Ex: Queijo coalho tradicional"
+                                  />
+                                  {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-price">Preço (R$) *</Label>
+                                  <Input
+                                    id="edit-price"
+                                    type="number"
+                                    step="0.01"
+                                    min="0"
+                                    value={formData.price || ""}
+                                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) || 0 })}
+                                    placeholder="0.00"
+                                  />
+                                  {errors.price && <p className="text-sm text-destructive">{errors.price}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-category">Categoria *</Label>
+                                  <Select
+                                    value={formData.category}
+                                    onValueChange={(value: "queijo" | "variados" | "doces") =>
+                                      setFormData({ ...formData, category: value })
+                                    }
+                                  >
+                                    <SelectTrigger>
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="queijo">{categoryNames.queijo}</SelectItem>
+                                      <SelectItem value="variados">{categoryNames.variados}</SelectItem>
+                                      <SelectItem value="doces">{categoryNames.doces}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  {errors.category && <p className="text-sm text-destructive">{errors.category}</p>}
+                                </div>
+
+                                <div className="space-y-2">
+                                  <Label htmlFor="edit-weight">Peso/Quantidade</Label>
+                                  <Input
+                                    id="edit-weight"
+                                    value={formData.weight}
+                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                                    placeholder="Ex: 500g, 1kg"
+                                  />
+                                  {errors.weight && <p className="text-sm text-destructive">{errors.weight}</p>}
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                  <Label htmlFor="edit-description">Descrição</Label>
+                                  <Textarea
+                                    id="edit-description"
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Descrição do produto..."
+                                    rows={3}
+                                  />
+                                  {errors.description && <p className="text-sm text-destructive">{errors.description}</p>}
+                                </div>
+
+                                <div className="space-y-2 md:col-span-2">
+                                  <Label htmlFor="edit-image">Imagem do Produto</Label>
+                                  <div className="flex items-center gap-4">
+                                    {imagePreview ? (
+                                      <div className="relative">
+                                        <img
+                                          src={imagePreview}
+                                          alt="Preview"
+                                          className="h-24 w-24 rounded-md object-cover"
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant="destructive"
+                                          size="icon"
+                                          className="absolute -right-2 -top-2 h-6 w-6"
+                                          onClick={removeImage}
+                                        >
+                                          <X className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <label
+                                        htmlFor="edit-image"
+                                        className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary"
+                                      >
+                                        <Upload className="h-6 w-6 text-muted-foreground" />
+                                        <Input
+                                          id="edit-image"
+                                          type="file"
+                                          accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                                          onChange={handleImageChange}
+                                          className="hidden"
+                                        />
+                                      </label>
+                                    )}
+                                    <p className="text-sm text-muted-foreground">
+                                      JPG, PNG ou WEBP (máx. 5MB)
+                                    </p>
+                                  </div>
+                                  {errors.image && <p className="text-sm text-destructive">{errors.image}</p>}
+                                </div>
+
+                                <div className="flex items-center space-x-2">
+                                  <Switch
+                                    id="edit-available"
+                                    checked={formData.available}
+                                    onCheckedChange={(checked) => setFormData({ ...formData, available: checked })}
+                                  />
+                                  <Label htmlFor="edit-available">Produto disponível</Label>
+                                </div>
+                              </div>
+
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  onClick={() => setIsEditDialogOpen(false)}
+                                >
+                                  Cancelar
+                                </Button>
+                                <Button type="submit" disabled={isUpdatingProduct}>
+                                  {isUpdatingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                  Salvar Alterações
+                                </Button>
+                              </div>
+                            </form>
+                          </DialogContent>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}

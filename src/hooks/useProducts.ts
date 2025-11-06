@@ -17,15 +17,9 @@ export const productSchema = z.object({
 
 export type ProductFormData = z.infer<typeof productSchema>;
 
-export interface Product {
+export interface Product extends ProductFormData {
   id: string;
-  name: string;
-  description?: string | null;
-  price: number;
-  category: string;
-  weight?: string | null;
   image_url?: string | null;
-  available: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -118,6 +112,39 @@ export function useProducts() {
     },
   });
 
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ id, productData, imageFile, currentImageUrl }: { id: string; productData: ProductFormData; imageFile?: File; currentImageUrl?: string | null }) => {
+      let imageUrl = currentImageUrl;
+
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const { error } = await supabase
+        .from("products")
+        .update({ 
+          name: productData.name,
+          description: productData.description || null,
+          price: productData.price,
+          category: productData.category,
+          weight: productData.weight || null,
+          image_url: imageUrl || null,
+          available: productData.available,
+        })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto atualizado com sucesso!");
+    },
+    onError: (error) => {
+      console.error("Erro ao atualizar produto:", error);
+      toast.error("Erro ao atualizar produto. Tente novamente.");
+    },
+  });
+
   return {
     products: products || [],
     isLoading,
@@ -125,5 +152,7 @@ export function useProducts() {
     addProduct: addProductMutation.mutate,
     isAddingProduct: addProductMutation.isPending,
     updateAvailability: updateAvailabilityMutation.mutate,
+    updateProduct: updateProductMutation.mutate,
+    isUpdatingProduct: updateProductMutation.isPending,
   };
 }
