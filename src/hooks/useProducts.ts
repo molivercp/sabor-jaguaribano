@@ -114,34 +114,48 @@ export function useProducts() {
 
   const updateProductMutation = useMutation({
     mutationFn: async ({ id, productData, imageFile, currentImageUrl }: { id: string; productData: ProductFormData; imageFile?: File; currentImageUrl?: string | null }) => {
-      let imageUrl = currentImageUrl;
+      console.log("[updateProduct] id=", id, "hasImage=", !!imageFile);
+      let imageUrl = currentImageUrl ?? null;
 
       if (imageFile) {
         imageUrl = await uploadImage(imageFile);
       }
 
-      const { error } = await supabase
+      const updates = {
+        name: productData.name,
+        description: productData.description || null,
+        price: productData.price,
+        category: productData.category,
+        weight: productData.weight || null,
+        image_url: imageUrl || null,
+        available: productData.available,
+      };
+
+      const { data, error } = await supabase
         .from("products")
-        .update({ 
-          name: productData.name,
-          description: productData.description || null,
-          price: productData.price,
-          category: productData.category,
-          weight: productData.weight || null,
-          image_url: imageUrl || null,
-          available: productData.available,
-        })
-        .eq("id", id);
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
 
       if (error) throw error;
+      return data as Product;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["products"] });
+    onSuccess: (updated) => {
+      // Atualiza cache imediatamente para refletir mudanças na UI
+      queryClient.setQueryData<Product[] | undefined>(["products"], (old) => {
+        if (!old) return [updated];
+        return old.map((p) => (p.id === updated.id ? { ...p, ...updated } : p));
+      });
       toast.success("Produto atualizado com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao atualizar produto:", error);
       toast.error("Erro ao atualizar produto. Tente novamente.");
+    },
+    onSettled: () => {
+      // Garante refetch do servidor
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 
