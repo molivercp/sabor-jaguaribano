@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProducts, productSchema, type ProductFormData } from "@/hooks/useProducts";
+import { useProducts, productSchema, type ProductFormData, type Product, type ProductFormDataWithImage } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -7,14 +7,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2, X, Upload } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Loader2, X, Upload, Pencil } from "lucide-react";
 import { categoryNames } from "@/data/products";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function Admin() {
-  const { products, isLoading, addProduct, isAddingProduct, updateAvailability } = useProducts();
+  const { products, isLoading, addProduct, isAddingProduct, updateAvailability, updateProduct, isUpdatingProduct } = useProducts();
   
   const [formData, setFormData] = useState<ProductFormData>({
     name: "",
@@ -28,6 +29,13 @@ export default function Admin() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Estado para edição
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editFormData, setEditFormData] = useState<ProductFormDataWithImage | null>(null);
+  const [editImageFile, setEditImageFile] = useState<File | null>(null);
+  const [editImagePreview, setEditImagePreview] = useState<string>("");
+  const [editErrors, setEditErrors] = useState<Record<string, string>>({});
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -93,6 +101,86 @@ export default function Admin() {
       style: "currency",
       currency: "BRL",
     }).format(price);
+  };
+
+  const openEditDialog = (product: Product) => {
+    setEditingProduct(product);
+    setEditFormData({
+      name: product.name,
+      description: product.description || "",
+      price: product.price,
+      category: product.category as "queijo" | "variados" | "doces",
+      weight: product.weight || "",
+      available: product.available,
+      image_url: product.image_url,
+    });
+    setEditImagePreview(product.image_url || "");
+    setEditImageFile(null);
+    setEditErrors({});
+  };
+
+  const closeEditDialog = () => {
+    setEditingProduct(null);
+    setEditFormData(null);
+    setEditImageFile(null);
+    setEditImagePreview("");
+    setEditErrors({});
+  };
+
+  const handleEditImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      setEditErrors({ ...editErrors, image: "Formato inválido. Use JPG, PNG ou WEBP." });
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setEditErrors({ ...editErrors, image: "Imagem deve ter no máximo 5MB." });
+      return;
+    }
+
+    setEditImageFile(file);
+    setEditImagePreview(URL.createObjectURL(file));
+    setEditErrors({ ...editErrors, image: "" });
+  };
+
+  const removeEditImage = () => {
+    setEditImageFile(null);
+    setEditImagePreview(editFormData?.image_url || "");
+  };
+
+  const validateEditForm = (): boolean => {
+    if (!editFormData) return false;
+    try {
+      productSchema.parse(editFormData);
+      setEditErrors({});
+      return true;
+    } catch (error: any) {
+      const fieldErrors: Record<string, string> = {};
+      error.errors.forEach((err: any) => {
+        fieldErrors[err.path[0]] = err.message;
+      });
+      setEditErrors(fieldErrors);
+      return false;
+    }
+  };
+
+  const handleEditSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateEditForm() || !editingProduct || !editFormData) return;
+
+    updateProduct({ 
+      id: editingProduct.id, 
+      productData: editFormData, 
+      imageFile: editImageFile || undefined 
+    }, {
+      onSuccess: () => {
+        closeEditDialog();
+      },
+    });
   };
 
   return (
@@ -253,6 +341,7 @@ export default function Admin() {
                     <TableHead>Categoria</TableHead>
                     <TableHead>Preço</TableHead>
                     <TableHead>Disponível</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -280,6 +369,15 @@ export default function Admin() {
                           }
                         />
                       </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditDialog(product)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -287,6 +385,150 @@ export default function Admin() {
             )}
           </div>
         </div>
+
+        {/* Dialog de Edição */}
+        <Dialog open={!!editingProduct} onOpenChange={(open) => !open && closeEditDialog()}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Editar Produto</DialogTitle>
+            </DialogHeader>
+            
+            {editFormData && (
+              <form onSubmit={handleEditSubmit} className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-name">Nome *</Label>
+                    <Input
+                      id="edit-name"
+                      value={editFormData.name}
+                      onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                      placeholder="Ex: Queijo coalho tradicional"
+                    />
+                    {editErrors.name && <p className="text-sm text-destructive">{editErrors.name}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-price">Preço (R$) *</Label>
+                    <Input
+                      id="edit-price"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={editFormData.price || ""}
+                      onChange={(e) => setEditFormData({ ...editFormData, price: parseFloat(e.target.value) || 0 })}
+                      placeholder="0.00"
+                    />
+                    {editErrors.price && <p className="text-sm text-destructive">{editErrors.price}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-category">Categoria *</Label>
+                    <Select
+                      value={editFormData.category}
+                      onValueChange={(value: "queijo" | "variados" | "doces") =>
+                        setEditFormData({ ...editFormData, category: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="queijo">{categoryNames.queijo}</SelectItem>
+                        <SelectItem value="variados">{categoryNames.variados}</SelectItem>
+                        <SelectItem value="doces">{categoryNames.doces}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {editErrors.category && <p className="text-sm text-destructive">{editErrors.category}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-weight">Peso/Quantidade</Label>
+                    <Input
+                      id="edit-weight"
+                      value={editFormData.weight}
+                      onChange={(e) => setEditFormData({ ...editFormData, weight: e.target.value })}
+                      placeholder="Ex: 500g, 1kg"
+                    />
+                    {editErrors.weight && <p className="text-sm text-destructive">{editErrors.weight}</p>}
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="edit-description">Descrição</Label>
+                    <Textarea
+                      id="edit-description"
+                      value={editFormData.description}
+                      onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                      placeholder="Descrição do produto..."
+                      rows={3}
+                    />
+                    {editErrors.description && <p className="text-sm text-destructive">{editErrors.description}</p>}
+                  </div>
+
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="edit-image">Imagem do Produto</Label>
+                    <div className="flex items-center gap-4">
+                      {editImagePreview ? (
+                        <div className="relative">
+                          <img
+                            src={editImagePreview}
+                            alt="Preview"
+                            className="h-24 w-24 rounded-md object-cover"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="icon"
+                            className="absolute -right-2 -top-2 h-6 w-6"
+                            onClick={removeEditImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor="edit-image"
+                          className="flex h-24 w-24 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-muted-foreground/25 hover:border-primary"
+                        >
+                          <Upload className="h-6 w-6 text-muted-foreground" />
+                          <Input
+                            id="edit-image"
+                            type="file"
+                            accept={ACCEPTED_IMAGE_TYPES.join(",")}
+                            onChange={handleEditImageChange}
+                            className="hidden"
+                          />
+                        </label>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        JPG, PNG ou WEBP (máx. 5MB)
+                      </p>
+                    </div>
+                    {editErrors.image && <p className="text-sm text-destructive">{editErrors.image}</p>}
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="edit-available"
+                      checked={editFormData.available}
+                      onCheckedChange={(checked) => setEditFormData({ ...editFormData, available: checked })}
+                    />
+                    <Label htmlFor="edit-available">Produto disponível</Label>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button type="button" variant="outline" onClick={closeEditDialog}>
+                    Cancelar
+                  </Button>
+                  <Button type="submit" disabled={isUpdatingProduct}>
+                    {isUpdatingProduct && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Salvar Alterações
+                  </Button>
+                </div>
+              </form>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

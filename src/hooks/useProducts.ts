@@ -30,6 +30,10 @@ export interface Product {
   updated_at?: string;
 }
 
+export interface ProductFormDataWithImage extends ProductFormData {
+  image_url?: string | null;
+}
+
 export function useProducts() {
   const queryClient = useQueryClient();
 
@@ -118,6 +122,50 @@ export function useProducts() {
     },
   });
 
+  const updateProductMutation = useMutation({
+    mutationFn: async ({ 
+      id, 
+      productData, 
+      imageFile 
+    }: { 
+      id: string; 
+      productData: ProductFormDataWithImage; 
+      imageFile?: File 
+    }) => {
+      let imageUrl = productData.image_url || null;
+
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const { data, error } = await supabase
+        .from("products")
+        .update({ 
+          name: productData.name,
+          description: productData.description || null,
+          price: productData.price,
+          category: productData.category,
+          weight: productData.weight || null,
+          image_url: imageUrl || null,
+          available: productData.available,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Produto atualizado com sucesso!");
+    },
+    onError: (error) => {
+      console.error("Erro ao atualizar produto:", error);
+      toast.error("Erro ao atualizar produto. Tente novamente.");
+    },
+  });
+
   return {
     products: products || [],
     isLoading,
@@ -125,5 +173,7 @@ export function useProducts() {
     addProduct: addProductMutation.mutate,
     isAddingProduct: addProductMutation.isPending,
     updateAvailability: updateAvailabilityMutation.mutate,
+    updateProduct: updateProductMutation.mutate,
+    isUpdatingProduct: updateProductMutation.isPending,
   };
 }
