@@ -148,7 +148,10 @@ export default function Admin() {
 
   const removeEditImage = () => {
     setEditImageFile(null);
-    setEditImagePreview(editFormData?.image_url || "");
+    setEditImagePreview("");
+    if (editFormData) {
+      setEditFormData({ ...editFormData, image_url: null });
+    }
   };
 
   const validateEditForm = (): boolean => {
@@ -175,7 +178,8 @@ export default function Admin() {
     updateProduct({ 
       id: editingProduct.id, 
       productData: editFormData, 
-      imageFile: editImageFile || undefined 
+      imageFile: editImageFile || undefined,
+      currentImageUrl: editingProduct.image_url
     }, {
       onSuccess: () => {
         closeEditDialog();

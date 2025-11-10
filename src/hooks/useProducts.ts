@@ -122,20 +122,41 @@ export function useProducts() {
     },
   });
 
+  const deleteImage = async (imageUrl: string) => {
+    try {
+      const path = imageUrl.split('/product-images/')[1];
+      if (path) {
+        await supabase.storage.from('product-images').remove([path]);
+      }
+    } catch (error) {
+      console.error('Erro ao deletar imagem:', error);
+    }
+  };
+
   const updateProductMutation = useMutation({
     mutationFn: async ({ 
       id, 
       productData, 
-      imageFile 
+      imageFile,
+      currentImageUrl
     }: { 
       id: string; 
       productData: ProductFormDataWithImage; 
-      imageFile?: File 
+      imageFile?: File;
+      currentImageUrl?: string | null;
     }) => {
-      let imageUrl = productData.image_url || null;
+      let imageUrl = productData.image_url;
 
+      // Se há um novo arquivo, deletar a imagem antiga e fazer upload da nova
       if (imageFile) {
+        if (currentImageUrl) {
+          await deleteImage(currentImageUrl);
+        }
         imageUrl = await uploadImage(imageFile);
+      } else if (productData.image_url === null && currentImageUrl) {
+        // Se a imagem foi removida (sem substituição), deletar do storage
+        await deleteImage(currentImageUrl);
+        imageUrl = null;
       }
 
       const { data, error } = await supabase
