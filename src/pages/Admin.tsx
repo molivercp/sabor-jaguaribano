@@ -24,6 +24,7 @@ export default function Admin() {
     category: "queijo",
     weight: "",
     available: true,
+    best_seller: false,
   });
   
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -90,6 +91,7 @@ export default function Admin() {
           category: "queijo",
           weight: "",
           available: true,
+          best_seller: false,
         });
         removeImage();
       },
@@ -112,6 +114,7 @@ export default function Admin() {
       category: product.category as "queijo" | "variados" | "doces",
       weight: product.weight || "",
       available: product.available,
+      best_seller: product.best_seller || false,
       image_url: product.image_url,
     });
     setEditImagePreview(product.image_url || "");
@@ -315,6 +318,15 @@ export default function Admin() {
               />
               <Label htmlFor="available">Produto disponível</Label>
             </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="best_seller"
+                checked={formData.best_seller}
+                onCheckedChange={(checked) => setFormData({ ...formData, best_seller: checked })}
+              />
+              <Label htmlFor="best_seller">Produto mais vendido</Label>
+            </div>
           </div>
 
           <Button type="submit" disabled={isAddingProduct} className="mt-6">
@@ -345,6 +357,7 @@ export default function Admin() {
                     <TableHead>Categoria</TableHead>
                     <TableHead>Preço</TableHead>
                     <TableHead>Disponível</TableHead>
+                    <TableHead>Mais Vendido</TableHead>
                     <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -372,6 +385,13 @@ export default function Admin() {
                             updateAvailability({ id: product.id, available: checked })
                           }
                         />
+                      </TableCell>
+                      <TableCell>
+                        {product.best_seller ? (
+                          <span className="text-sm font-medium text-primary">⭐ Sim</span>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">Não</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Button
@@ -517,6 +537,15 @@ export default function Admin() {
                       onCheckedChange={(checked) => setEditFormData({ ...editFormData, available: checked })}
                     />
                     <Label htmlFor="edit-available">Produto disponível</Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Switch
+                      id="edit-best-seller"
+                      checked={editFormData.best_seller || false}
+                      onCheckedChange={(checked) => setEditFormData({ ...editFormData, best_seller: checked })}
+                    />
+                    <Label htmlFor="edit-best-seller">Produto mais vendido</Label>
                   </div>
                 </div>
 

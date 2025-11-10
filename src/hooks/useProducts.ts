@@ -13,6 +13,7 @@ export const productSchema = z.object({
   }),
   weight: z.string().trim().max(50, "Peso deve ter no máximo 50 caracteres").optional(),
   available: z.boolean().default(true),
+  best_seller: z.boolean().default(false),
 });
 
 export type ProductFormData = z.infer<typeof productSchema>;
@@ -26,6 +27,7 @@ export interface Product {
   weight?: string | null;
   image_url?: string | null;
   available: boolean;
+  best_seller?: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -86,6 +88,7 @@ export function useProducts() {
           weight: productData.weight || null,
           image_url: imageUrl || null,
           available: productData.available,
+          best_seller: productData.best_seller || false,
         }])
         .select()
         .single();
@@ -169,6 +172,7 @@ export function useProducts() {
           weight: productData.weight || null,
           image_url: imageUrl || null,
           available: productData.available,
+          best_seller: productData.best_seller || false,
         })
         .eq("id", id)
         .select()

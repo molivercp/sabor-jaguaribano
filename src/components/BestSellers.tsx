@@ -5,20 +5,15 @@ import { useMemo } from "react";
 import { Loader2 } from "lucide-react";
 
 export function BestSellers() {
-  // IDs dos produtos mais vendidos: queijo coalho tradicional 1kg, doce de leite cremoso, manteiga da terra 500ml
-  const bestSellerIds = ["q1", "d1", "v13"];
   const { searchTerm } = useSearch();
   const { products, isLoading } = useProducts();
 
   const bestSellers = useMemo(
     () =>
       products
-        .filter((p) => p.available !== false)
-        .filter(
-          (p) =>
-            bestSellerIds.includes(p.id) &&
-            p.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        .filter((p) => p.available !== false && p.best_seller === true)
+        .filter((p) => p.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .slice(0, 3) // Limitar a 3 produtos
         .map((p) => ({
           id: p.id,
           name: p.name,
@@ -29,7 +24,7 @@ export function BestSellers() {
           image: p.image_url || undefined,
           available: p.available,
         })),
-    [products, searchTerm, bestSellerIds]
+    [products, searchTerm]
   );
 
   if (isLoading) {
