@@ -41,18 +41,46 @@ export function BestSellers() {
     return null;
   }
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Produtos Mais Vendidos - Sabor Jaguaribano",
+    "itemListElement": bestSellers.map((product, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Product",
+        "name": product.name,
+        "description": product.description || `${product.name} - Produto regional do Ceará`,
+        "offers": {
+          "@type": "Offer",
+          "price": product.price,
+          "priceCurrency": "BRL",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Sabor Jaguaribano"
+          }
+        }
+      }
+    }))
+  };
+
   return (
-    <section className="py-16 px-4 bg-background">
+    <section className="py-16 px-4 bg-background" id="mais-vendidos" aria-labelledby="best-sellers-heading">
+      <script type="application/ld+json">
+        {JSON.stringify(structuredData)}
+      </script>
       <div className="container mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="mb-4 text-4xl font-bold text-secondary">
+        <header className="text-center mb-12">
+          <h2 id="best-sellers-heading" className="mb-4 text-4xl font-bold text-secondary">
             Mais Vendidos
           </h2>
           <p className="text-lg text-muted-foreground">
             Os favoritos dos nossos clientes
           </p>
-        </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
+        </header>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto" role="list">
           {bestSellers.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

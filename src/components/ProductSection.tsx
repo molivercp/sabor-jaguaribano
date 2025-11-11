@@ -56,8 +56,9 @@ export function ProductSection() {
   }
 
   return (
-    <section className="py-16">
+    <section className="py-16" id="produtos" aria-labelledby="products-heading">
       <div className="container mx-auto">
+        <h2 id="products-heading" className="sr-only">Nossos Produtos</h2>
         {categories.map((category) => {
           const categoryProducts = allFilteredProducts.filter((p) => p.category === category);
 
@@ -67,10 +68,10 @@ export function ProductSection() {
 
           return (
             <div key={category} className="mb-16" id={category.toString()}>
-              <h2 className="mb-8 text-center text-4xl font-bold text-secondary">
+              <h3 className="mb-8 text-center text-4xl font-bold text-secondary">
                 {categoryNames[category]}
-              </h2>
-              <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              </h3>
+              <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" role="list">
                 {categoryProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}

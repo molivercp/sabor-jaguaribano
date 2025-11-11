@@ -1,11 +1,11 @@
 export function AboutSection() {
   return (
-    <section className="py-16 px-4 bg-muted/30">
+    <section className="py-16 px-4 bg-muted/30" id="sobre" aria-labelledby="about-heading">
       <div className="container mx-auto max-w-4xl">
-        <h2 className="mb-8 text-center text-4xl font-bold text-secondary">
+        <h2 id="about-heading" className="mb-8 text-center text-4xl font-bold text-secondary">
           Sobre Nós
         </h2>
-        <div className="space-y-6 text-center">
+        <article className="space-y-6 text-center">
           <p className="text-lg text-foreground/90 leading-relaxed">
             O <strong>Sabor Jaguaribano</strong> nasceu do amor pela cultura e tradição 
             do sertão nordestino. Trazemos para sua mesa os melhores produtos regionais 
@@ -20,7 +20,7 @@ export function AboutSection() {
             Realizamos entregas em <strong>Fortaleza às terças e quintas-feiras</strong>, 
             levando até você o verdadeiro sabor do sertão com toda comodidade.
           </p>
-        </div>
+        </article>
       </div>
     </section>
   );
