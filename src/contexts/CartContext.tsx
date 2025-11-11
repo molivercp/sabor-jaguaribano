@@ -9,6 +9,8 @@ interface CartContextType {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   getTotal: () => number;
+  getShippingFee: (deliveryMethod: string) => number;
+  getTotalWithShipping: (deliveryMethod: string) => number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -57,6 +59,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   };
 
+  const getShippingFee = (deliveryMethod: string) => {
+    if (deliveryMethod !== "loja") return 0;
+    const total = getTotal();
+    return total < 100 ? 4 : 0;
+  };
+
+  const getTotalWithShipping = (deliveryMethod: string) => {
+    return getTotal() + getShippingFee(deliveryMethod);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -66,6 +78,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         updateQuantity,
         clearCart,
         getTotal,
+        getShippingFee,
+        getTotalWithShipping,
       }}
     >
       {children}
